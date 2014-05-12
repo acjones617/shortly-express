@@ -15,7 +15,7 @@ app.configure(function() {
   app.set('views', __dirname + '/views');
   app.set('view engine', 'ejs');
   app.use(partials());
-  app.use(express.bodyParser())
+  app.use(express.bodyParser());
   app.use(express.static(__dirname + '/public'));
 });
 
@@ -27,10 +27,47 @@ app.get('/create', function(req, res) {
   res.render('index');
 });
 
+app.get('/login', function(req, res) {
+  res.render('login');
+});
+
+app.post('/login', function(req, res) {
+
+});
+
+app.get('/signup', function(req, res) {
+  var isTaken = req.query.taken;
+  console.log(isTaken);
+  res.render('signup', {'taken': isTaken});
+});
+
+app.post('/signup', function(req, res) {
+  var username = req.body.username;
+  var password = req.body.password;
+
+  new User({username: username})
+    .fetch({columns: 'username'}).then(function(found) {
+      if (found) {
+        res.redirect('/signup?taken=true');
+      } else {
+        var user = new User({
+          username: username,
+          password: password
+        });
+
+        user.save().then(function(newUser) {
+          Users.add(newUser);
+          res.redirect('/');
+        });
+      }
+    });
+});
+
+
 app.get('/links', function(req, res) {
   Links.reset().fetch().then(function(links) {
     res.send(200, links.models);
-  })
+  });
 });
 
 app.post('/links', function(req, res) {
