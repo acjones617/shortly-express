@@ -29,6 +29,12 @@ app.get('/create', util.checkUser, function(req, res) {
   res.render('index');
 });
 
+app.get('/logout', function(req, res) {
+  req.session.destroy(function() {
+    res.redirect('/');
+  });
+});
+
 app.get('/login', function(req, res) {
   res.render('login', {loginCase: req.query.loginCase});
 });
