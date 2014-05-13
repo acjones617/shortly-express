@@ -18,15 +18,15 @@ app.configure(function() {
   app.use(express.bodyParser());
   app.use(express.static(__dirname + '/public'));
   app.use(express.cookieParser('va09%7$$8WAv79'));
-  app.use(express.session());
+  app.use(express.session({cookie: {maxAge: 600000}}));
 });
 
-app.get('/', function(req, res) {
-  util.checkUser(req, res, 'index', req.query.login);
+app.get('/', util.checkUser, function(req, res) {
+  res.render('index');
 });
 
-app.get('/create', function(req, res) {
-  util.checkUser(req, res, 'index', req.query.login);
+app.get('/create', util.checkUser, function(req, res) {
+  res.render('index');
 });
 
 app.get('/login', function(req, res) {
@@ -42,7 +42,11 @@ app.post('/login', function(req, res) {
       if (found) {
         found.correctPass(password, function(err, results) {
           if (results) {
-            res.redirect('/?login=true');
+            req.session.regenerate(function() {
+              req.session.user = username;
+              res.redirect('/');
+            });
+            // res.redirect('/?login=true');
           } else {
             res.redirect('/login?loginCase=badPass');
           }
