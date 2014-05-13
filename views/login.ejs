@@ -12,6 +12,11 @@
       <input type="submit" value="Login">
     </div>
 </form>
+<% if (noUser) { %>
+<p class="usernameTaken">
+  We have no user by that name in our system. Please go to <a href="/signup">our signup page</a> to create an account.
+</p>
+<% } %>
 <p>
   <a href="/signup">Create an Account &rarr;</a>
 <p>
