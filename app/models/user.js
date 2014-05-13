@@ -8,30 +8,19 @@ var User = db.Model.extend({
   hasTimestamps: true,
 
   initialize: function() {
-    console.log('trying to intialize new user');
-    //this.on('creating', function(model, attrs, options) {
+    console.log('initializing model', this);
+    bcrypt.hash(this.get('password'), null, null, function(err, hash) {
+      console.log('passwordset', hash, this);
+      this.set('password', hash);
+      console.log('AFTER passwordset', this.get('password'), this);
+      this.save();
+    }.bind(this));
+
+  },
+
+  correctPass: function(password, cb) {
+    bcrypt.compare(password, this.get('password'), cb);
   }
 });
 
-
 module.exports = User;
-
-// var Link = db.Model.extend({
-//   tableName: 'urls',
-//   hasTimestamps: true,
-//   defaults: {
-//     visits: 0
-//   },
-//   clicks: function() {
-//     return this.hasMany(Click);
-//   },
-//   initialize: function(){
-//     this.on('creating', function(model, attrs, options){
-//       var shasum = crypto.createHash('sha1');
-//       shasum.update(model.get('url'));
-//       model.set('code', shasum.digest('hex').slice(0, 5));
-//     });
-//   }
-// });
-
-// module.exports = Link;
