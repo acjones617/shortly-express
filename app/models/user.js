@@ -1,6 +1,7 @@
 var db = require('../config');
 var bcrypt = require('bcrypt-nodejs');
 var Promise = require('bluebird');
+var Link = require('./link.js');
 
 var User = db.Model.extend({
   tableName: 'users',
@@ -13,6 +14,10 @@ var User = db.Model.extend({
       this.save();
     }.bind(this));
 
+  },
+
+  link: function() {
+    return this.hasMany(Link);
   },
 
   correctPass: function(password, cb) {
