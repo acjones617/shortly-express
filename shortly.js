@@ -17,18 +17,20 @@ app.configure(function() {
   app.use(partials());
   app.use(express.bodyParser());
   app.use(express.static(__dirname + '/public'));
+  app.use(express.cookieParser('va09%7$$8WAv79'));
+  app.use(express.session());
 });
 
 app.get('/', function(req, res) {
-  res.render('index');
+  util.checkUser(req, res, 'index', req.query.login);
 });
 
 app.get('/create', function(req, res) {
-  res.render('index');
+  util.checkUser(req, res, 'index', req.query.login);
 });
 
 app.get('/login', function(req, res) {
-  res.render('login', {noUser: req.query.noUser});
+  res.render('login', {loginCase: req.query.loginCase});
 });
 
 app.post('/login', function(req, res) {
@@ -36,13 +38,17 @@ app.post('/login', function(req, res) {
   var password = req.body.password;
 
   new User({username: username})
-    .fetch({columns: 'username'}).then(function(found) {
+    .fetch().then(function(found) {
       if (found) {
         found.correctPass(password, function(err, results) {
-          console.log('found it', results);
+          if (results) {
+            res.redirect('/?login=true');
+          } else {
+            res.redirect('/login?loginCase=badPass');
+          }
         });
       } else {
-        res.redirect('/login?noUser=true');
+        res.redirect('/login?loginCase=noUser');
       }
     });
 });
@@ -62,7 +68,6 @@ app.post('/signup', function(req, res) {
       var user = new User({
         username: username,
         password: password
-
       });
       res.redirect('/login');
     }
